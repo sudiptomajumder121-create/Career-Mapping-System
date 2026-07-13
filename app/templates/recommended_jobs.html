@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+{% block content %}
+<main class="container py-4 py-lg-5">
+  <section class="hero-panel mb-4"><div><p class="eyebrow">PERSONALIZED CAREER DASHBOARD</p><h1>Recommended Jobs</h1><p class="mb-0">Your top five openings, ranked by the skills in your profile.</p></div><a class="btn btn-light" href="{{ url_for('candidate_profile') }}">Update profile</a></section>
+  {% if job_cards %}
+  <div class="row g-4">
+    {% for card in job_cards %}{% set job = card.job %}
+    <div class="col-md-6 col-xl-4"><article class="card job-card h-100 border-0 shadow-sm"><div class="card-body p-4 d-flex flex-column">
+      <div class="d-flex align-items-start gap-3 mb-3"><div class="company-logo logo-{{ job.company_logo|lower }}">{{ job.company_logo or job.company[:2]|upper }}</div><div class="flex-grow-1"><p class="company-name mb-1">{{ job.company }}</p><h2 class="h5 mb-0">{{ job.title }}</h2></div><span class="match-score">{{ card.score }}% Skill Match</span></div>
+      <p class="small text-muted mb-2">Required skills</p><div class="mb-3">{% for skill in (job.required_skills or '').split(',') %}<span class="badge skill-badge">{{ skill.strip() }}</span>{% endfor %}</div>
+      <div class="job-meta mt-auto"><span>📍 {{ job.location }}</span><span>💼 {{ job.experience_required }}</span></div>
+      <a href="{{ url_for('post_cvs', jobid=job.id) }}" class="btn btn-primary mt-3">Apply Now</a>
+    </div></article></div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state"><h2 class="h4">No matching jobs found based on your current skills.</h2><p>Please update your profile or explore all available jobs.</p></div>
+  {% endif %}
+  <div class="text-center mt-4"><a href="{{ url_for('show_jobs') }}" class="btn btn-outline-primary px-4">See All Jobs</a></div>
+</main>
+{% endblock %}

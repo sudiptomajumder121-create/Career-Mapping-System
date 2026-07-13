@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+{% block content %}
+<main class="container py-4 py-lg-5">
+  <section class="hero-panel mb-4"><div><p class="eyebrow">COMPLETE OPPORTUNITY CATALOGUE</p><h1>All Jobs</h1><p class="mb-0">Explore every opening across our technology-company partners.</p></div></section>
+  <form class="filter-panel shadow-sm mb-4" method="GET" action="{{ url_for('show_jobs') }}">
+    <div class="row g-2">
+      <div class="col-md-4"><input class="form-control" name="title" value="{{ filters.title }}" placeholder="Search by job title"></div>
+      <div class="col-md-4"><select class="form-select" name="company"><option value="">All companies</option>{% for company in companies %}<option value="{{ company }}" {% if filters.company == company %}selected{% endif %}>{{ company }}</option>{% endfor %}</select></div>
+      <div class="col-md-4"><input class="form-control" name="skill" value="{{ filters.skill }}" placeholder="Filter by skill"></div>
+      <div class="col-md-4"><select class="form-select" name="location"><option value="">All locations</option>{% for location in locations %}<option value="{{ location }}" {% if filters.location == location %}selected{% endif %}>{{ location }}</option>{% endfor %}</select></div>
+      <div class="col-md-4"><select class="form-select" name="experience"><option value="">All experience levels</option>{% for experience in experiences %}<option value="{{ experience }}" {% if filters.experience == experience %}selected{% endif %}>{{ experience }}</option>{% endfor %}</select></div>
+      <div class="col-md-4 d-grid"><button class="btn btn-primary" type="submit">Apply Filters</button></div>
+    </div>
+  </form>
+  <div class="row g-4">
+    {% for card in job_cards %}{% set job = card.job %}
+    <div class="col-md-6 col-xl-4"><article class="card job-card h-100 border-0 shadow-sm"><div class="card-body p-4 d-flex flex-column">
+      <div class="d-flex align-items-start gap-3 mb-3"><div class="company-logo logo-{{ job.company_logo|lower }}">{{ job.company_logo or job.company[:2]|upper }}</div><div class="flex-grow-1"><p class="company-name mb-1">{{ job.company }}</p><h2 class="h5 mb-0">{{ job.title }}</h2></div>{% if card.score and card.score > 0 %}<span class="match-score">{{ card.score }}% Skill Match</span>{% endif %}</div>
+      <p class="job-description">{{ job.description }}</p><div class="mb-3">{% for skill in (job.required_skills or '').split(',') %}<span class="badge skill-badge">{{ skill.strip() }}</span>{% endfor %}</div>
+      <div class="job-meta mt-auto"><span>📍 {{ job.location }}</span><span>💼 {{ job.experience_required }}</span></div>
+      {% if current_user.is_authenticated and current_user.usertype == 'Job Seeker' %}<a href="{{ url_for('post_cvs', jobid=job.id) }}" class="btn btn-outline-primary mt-3">Apply Now</a>{% endif %}
+    </div></article></div>
+    {% else %}<div class="col-12"><div class="empty-state">No jobs match these filters. Try broadening your search.</div></div>{% endfor %}
+  </div>
+</main>
+{% endblock %}

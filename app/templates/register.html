@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+{% block content %}
+<main class="container py-5"><div class="row justify-content-center"><div class="col-xl-9">
+  <form method="POST" enctype="multipart/form-data" class="profile-card shadow-sm">
+    {{ form.hidden_tag() }}
+    <h1 class="h3">Create your career profile</h1><p class="text-muted">Add your skills and interests to receive tailored IT job recommendations.</p>
+    <div class="row g-3">
+      <div class="col-md-4">{{ form.usertype.label(class="form-label") }}{{ form.usertype(class="form-select") }}</div>
+      <div class="col-md-8">{{ form.full_name.label(class="form-label") }}{{ form.full_name(class="form-control", placeholder="Your full name") }}{% for e in form.full_name.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}</div>
+      <div class="col-md-6">{{ form.email.label(class="form-label") }}{{ form.email(class="form-control") }}{% for e in form.email.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}</div>
+      <div class="col-md-3">{{ form.password.label(class="form-label") }}{{ form.password(class="form-control") }}</div><div class="col-md-3">{{ form.confirm_password.label(class="form-label") }}{{ form.confirm_password(class="form-control") }}</div>
+      <div class="col-md-6">{{ form.phone_number.label(class="form-label") }}{{ form.phone_number(class="form-control") }}</div><div class="col-md-6">{{ form.roll_number.label(class="form-label") }}{{ form.roll_number(class="form-control") }}</div>
+      <div class="col-md-6">{{ form.college.label(class="form-label") }}{{ form.college(class="form-control") }}</div><div class="col-md-6">{{ form.degree_course.label(class="form-label") }}{{ form.degree_course(class="form-control") }}</div>
+      <div class="col-md-6"><label class="form-label d-block">{{ form.skills.label.text }}</label><div class="choice-grid">{% for choice in form.skills %}<label>{{ choice(class="form-check-input") }} {{ choice.label.text }}</label>{% endfor %}</div></div>
+      <div class="col-md-6"><label class="form-label d-block">{{ form.programming_languages.label.text }}</label><div class="choice-grid">{% for choice in form.programming_languages %}<label>{{ choice(class="form-check-input") }} {{ choice.label.text }}</label>{% endfor %}</div></div>
+      <div class="col-md-6">{{ form.skills_custom.label(class="form-label") }}{{ form.skills_custom(class="form-control", placeholder="e.g. Flask, Power BI") }}</div>
+      <div class="col-md-6"><label class="form-label d-block">{{ form.areas_of_interest.label.text }}</label><div class="choice-grid">{% for choice in form.areas_of_interest %}<label>{{ choice(class="form-check-input") }} {{ choice.label.text }}</label>{% endfor %}</div></div>
+      <div class="col-md-4">{{ form.preferred_career_field.label(class="form-label") }}{{ form.preferred_career_field(class="form-select") }}</div><div class="col-md-4">{{ form.preferred_job_location.label(class="form-label") }}{{ form.preferred_job_location(class="form-select") }}</div><div class="col-md-4">{{ form.experience_level.label(class="form-label") }}{{ form.experience_level(class="form-select") }}</div>
+      <div class="col-12">{{ form.resume.label(class="form-label") }}{{ form.resume(class="form-control") }}</div>
+    </div>
+    <div class="mt-4">{{ form.submit(class="btn btn-primary px-4") }} <a href="{{ url_for('login') }}" class="ms-3">Already have an account? Log in</a></div>
+  </form>
+</div></div></main>
+{% endblock %}
