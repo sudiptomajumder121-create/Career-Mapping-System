@@ -26,11 +26,10 @@ rev = [
 ]
 
 
-Review_Obj = Review.query.all()
-if len(Review_Obj) < 3:
-    Random_Review = rev
-else:
-    Random_Review = random.sample(Review_Obj, 3)
+# Flask-SQLAlchemy 3 requires an active application context for queries.  Keep
+# the existing sample-review fallback available during module import; database
+# review queries happen only from request handlers.
+Random_Review = rev
 
 
 @app.route("/register", methods=['GET', 'POST'])

@@ -1,4 +1,6 @@
 """Add Career Mapping System columns to an existing SQLite database safely."""
+from sqlalchemy import inspect, text
+
 from app import app, db
 
 
@@ -16,10 +18,10 @@ JOB_COLUMNS = {
 
 
 def add_missing_columns(table, columns):
-    existing = {column['name'] for column in db.inspect(db.engine).get_columns(table)}
+    existing = {column['name'] for column in inspect(db.engine).get_columns(table)}
     for name, sql_type in columns.items():
         if name not in existing:
-            db.session.execute(f'ALTER TABLE {table} ADD COLUMN {name} {sql_type}')
+            db.session.execute(text(f'ALTER TABLE {table} ADD COLUMN {name} {sql_type}'))
 
 
 with app.app_context():
