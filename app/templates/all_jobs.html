@@ -18,7 +18,7 @@
       <div class="d-flex align-items-start gap-3 mb-3"><div class="company-logo logo-{{ job.company_logo|lower }}">{{ job.company_logo or job.company[:2]|upper }}</div><div class="flex-grow-1"><p class="company-name mb-1">{{ job.company }}</p><h2 class="h5 mb-0">{{ job.title }}</h2></div>{% if card.score and card.score > 0 %}<span class="match-score">{{ card.score }}% Skill Match</span>{% endif %}</div>
       <p class="job-description">{{ job.description }}</p><div class="mb-3">{% for skill in (job.required_skills or '').split(',') %}<span class="badge skill-badge">{{ skill.strip() }}</span>{% endfor %}</div>
       <div class="job-meta mt-auto"><span>📍 {{ job.location }}</span><span>💼 {{ job.experience_required }}</span></div>
-      {% if current_user.is_authenticated and current_user.usertype == 'Job Seeker' %}<a href="{{ url_for('post_cvs', jobid=job.id) }}" class="btn btn-outline-primary mt-3">Apply Now</a>{% endif %}
+      {% if current_user.is_authenticated and current_user.usertype == 'Job Seeker' %}<a href="{{ url_for('post_cvs', jobid=job.id) }}" class="btn btn-outline-primary mt-3">Apply Now</a>{% elif current_user.is_authenticated and current_user.usertype == 'Company' and job.user_id == current_user.id %}<a href="{{ url_for('show_applications', jobid=job.id) }}" class="btn btn-outline-primary mt-3">Applications</a>{% elif not current_user.is_authenticated %}<a href="{{ url_for('login', next=url_for('post_cvs', jobid=job.id)) }}" class="btn btn-outline-primary mt-3">Apply Now</a>{% endif %}
     </div></article></div>
     {% else %}<div class="col-12"><div class="empty-state">No jobs match these filters. Try broadening your search.</div></div>{% endfor %}
   </div>

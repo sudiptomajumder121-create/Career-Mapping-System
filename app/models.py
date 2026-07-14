@@ -47,8 +47,13 @@ class Application(db.Model):
     experience = db.Column(db.Integer, nullable=False)
     cv = db.Column(db.String(20), nullable=False)
     cover_letter = db.Column(db.Text, nullable=False)
+    full_name = db.Column(db.String(100), nullable=False)
+    email = db.Column(db.String(120), nullable=False)
+    phone_number = db.Column(db.String(25), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     job_id = db.Column(db.Integer, db.ForeignKey('jobs.id'), nullable=False)
+
+    __table_args__ = (db.UniqueConstraint('user_id', 'job_id', name='uq_application_user_job'),)
 
 
     def __repr__(self):

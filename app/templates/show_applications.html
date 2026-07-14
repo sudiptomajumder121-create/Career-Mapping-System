@@ -1,24 +1,18 @@
 {% extends "layout.html" %}
 {% block content %}
-<section class="jumbotron text-center">
-<br>
-  <div class="row">
+<main class="container py-4 py-lg-5">
+  <section class="hero-panel mb-4"><div><p class="eyebrow">CANDIDATE PIPELINE</p><h1>Applications for {{ job.title }}</h1><p class="mb-0">{{ job.company }} · {{ applications|length }} applicant{{ '' if applications|length == 1 else 's' }}</p></div></section>
+  <div class="row g-4">
     {% for application in applications %}
-    <div class="col-lg-6">
-      <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
-        <div class="col p-4 d-flex flex-column position-static">
-          <strong class="d-inline-block mb-2 text-primary">Industry: {{application.industry}}</strong>
-          <h3 class="mb-0">Degree: {{application.degree[1:]}}</h3>
-          <h3 class="mb-0">Experience in years: {{application.experience}}</h3>
-          <div class="mb-1 text-muted">Date: {{application.date_posted}}</div>
-          <p class="card-text mb-auto">{{application.cover_letter}}</p>
-        </div>
-        <div class="col-auto d-none d-lg-block">
-          <a href="/resume/{{application.id}}"  class="btn btn-primary mb-2" role="button" target="_blank" aria-disabled="true">CV / Resume</a>
-        </div>
-      </div>
-    </div>
+    <div class="col-md-6"><article class="card job-card h-100 border-0 shadow-sm"><div class="card-body p-4 d-flex flex-column">
+      <h2 class="h5 mb-1">{{ application.full_name }}</h2><p class="text-muted mb-3">{{ application.email }} · {{ application.phone_number }}</p>
+      <p class="small text-muted mb-1">Cover letter</p><p class="job-description">{{ application.cover_letter }}</p>
+      <div class="job-meta mt-auto"><span>Submitted {{ application.date_posted.strftime('%d %b %Y') }}</span></div>
+      <a href="{{ url_for('resume', id=application.id) }}" target="_blank" class="btn btn-outline-primary mt-3">View Resume</a>
+    </div></article></div>
+    {% else %}
+    <div class="col-12"><div class="empty-state">No applications have been received for this job yet.</div></div>
     {% endfor %}
   </div>
-</section>
+</main>
 {% endblock %}

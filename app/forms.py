@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from flask_wtf.file import FileField, FileAllowed
+from flask_wtf.file import FileField, FileAllowed, FileRequired
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, HiddenField, SelectField, SelectMultipleField, IntegerField, TextAreaField
 from wtforms.widgets import CheckboxInput, ListWidget
 from wtforms.validators import DataRequired, Length, Email, EqualTo, Optional, ValidationError
@@ -131,45 +131,9 @@ class JobForm(FlaskForm):
 
 
 class ApplicationForm(FlaskForm):
-    gender = SelectField('Gender', choices=[('Male', 'Male'),
-                                            ('Female', 'Female'),
-                                            ('Others', 'Other')],
-                         default='male',
-                         validators=[DataRequired()])
-    degree = SelectField('Degree',
-                         default='eSchool',
-                         choices=[('eSchool', 'School'),
-                                  ('dHighSchool', 'HighSchool'),
-                                  ('cBachelor', 'Bachelor'),
-                                  ('bMaster', 'Master'),
-                                  ('aPHD', 'PHD')],
-                         validators=[DataRequired()])
-    industry = SelectField('Industry',
-                           default='Construction',
-                           choices=[('Construction', 'Construction'),
-                                    ('Education', 'Education'),
-                                    ('Food And Beverage', 'Food and Beverage'),
-                                    ('Pharmaceutical', 'Pharmaceutical'),
-                                    ('Entertainment', 'Entertainment'),
-                                    ('Manufacturing', 'Manufacturing'),
-                                    ('Telecommunication', 'Telecommunication'),
-                                    ('Agriculture', 'Agriculture'),
-                                    ('Transportation', 'Transportation'),
-                                    ('Computer And Technology', 'Computer and Technology'),
-                                    ('Healthcare', 'Healthcare'),
-                                    ('Media And News', 'Media and News'),
-                                    ('Hospitality', 'Hospitality'),
-                                    ('Energy', 'Energy'),
-                                    ('Fashion', 'Fashion'),
-                                    ('Telecommunication', 'Telecommunication'),
-                                    ('Finance and Economic', 'Finance and Economic'),
-                                    ('Advertising And Marketing', 'Advertising and Marketing'),
-                                    ('Mining', 'Mining'),
-                                    ('Aerospace', 'Aerospace')],
-                           validators=[DataRequired()])
-    experience = IntegerField('Professional Experience in years',
-                              validators=[DataRequired()])
-    cv = FileField('Update Resume', validators=[FileAllowed(['jpg', 'png', 'bmp', 'pdf'])])
-    cover_letter = TextAreaField('Cover Letter',
-                                 validators=[DataRequired()])
-    submit = SubmitField('Submit')
+    full_name = StringField('Full Name', validators=[DataRequired(), Length(min=2, max=100)])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    phone_number = StringField('Phone Number', validators=[DataRequired(), Length(min=6, max=25)])
+    resume = FileField('Resume Upload', validators=[FileRequired('Please upload your resume.'), FileAllowed(['pdf', 'doc', 'docx'], 'Please upload a PDF, DOC, or DOCX file.')])
+    cover_letter = TextAreaField('Cover Letter', validators=[DataRequired()])
+    submit = SubmitField('Submit Application')

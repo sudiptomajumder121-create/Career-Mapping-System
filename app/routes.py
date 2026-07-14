@@ -1,4 +1,4 @@
-from flask import render_template, url_for, flash, redirect, request
+from flask import render_template, url_for, flash, redirect, request, abort
 from app import app, db, bcrypt
 from PIL import Image
 import os
@@ -7,6 +7,7 @@ from app.forms import RegistrationForm, CandidateProfileForm, LoginForm, ReviewF
 from app.models import User, Jobs, Review, Application, SurveyResponse
 from flask_login import login_user, current_user, logout_user, login_required
 from werkzeug.utils import secure_filename
+from sqlalchemy.exc import IntegrityError
 from app.matching import ranked_jobs, has_skill_match
 import random
 
@@ -183,23 +184,37 @@ def candidate_profile():
 @app.route("/post_cvs/<jobid>", methods=['GET', 'POST'])
 @login_required
 def post_cvs(jobid):
-    form = ApplicationForm()
-    job = Jobs.query.filter_by(id=jobid).first()
-    if form.validate_on_submit():
-        application = Application(gender=form.gender.data,
-                              degree=form.degree.data,
-                              industry=form.industry.data,
-                              experience=form.experience.data,
-                              cover_letter=form.cover_letter.data,
-                              application_submiter=current_user,
-                              application_jober=job,
-                              cv=form.cv.data.filename)
-        print(form.cv.data)
-        picture_file = save_picture(form.cv.data)
-        db.session.add(application)
-        db.session.commit()
+    if current_user.usertype != 'Job Seeker':
+        flash('Only job seekers can submit applications.', 'info')
         return redirect(url_for('show_jobs'))
-    return render_template('post_cvs.html', form=form, Random_Review=Random_Review)
+    form = ApplicationForm()
+    job = Jobs.query.get_or_404(jobid)
+    existing_application = Application.query.filter_by(user_id=current_user.id, job_id=job.id).first()
+    if existing_application:
+        flash('You have already applied for this job.', 'info')
+        return redirect(url_for('recommended_jobs'))
+    if request.method == 'GET':
+        form.full_name.data = current_user.full_name or current_user.username
+        form.email.data = current_user.email
+        form.phone_number.data = current_user.phone_number
+    if form.validate_on_submit():
+        application = Application(full_name=form.full_name.data.strip(), email=form.email.data.strip(),
+                                  phone_number=form.phone_number.data.strip(), gender='Not specified',
+                                  degree=current_user.degree_course or 'Not specified',
+                                  industry=job.industry, experience=0,
+                                  cover_letter=form.cover_letter.data.strip(),
+                                  application_submiter=current_user, application_jober=job,
+                                  cv=save_resume(form.resume.data))
+        try:
+            db.session.add(application)
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            flash('You have already applied for this job.', 'info')
+            return redirect(url_for('recommended_jobs'))
+        flash('Application submitted successfully!', 'success')
+        return redirect(url_for('recommended_jobs'))
+    return render_template('post_cvs.html', form=form, job=job, Random_Review=Random_Review)
 
 @app.route("/post_jobs", methods=['GET', 'POST'])
 @login_required
@@ -242,8 +257,11 @@ def posted_jobs():
 @app.route("/show_applications/<jobid>", methods=['GET'])
 @login_required
 def show_applications(jobid):
-    applications = Application.query.filter_by(job_id=jobid).order_by(Application.degree, Application.experience.desc()).all()
-    return render_template('show_applications.html', applications=applications, Random_Review=Random_Review)
+    job = Jobs.query.get_or_404(jobid)
+    if current_user.usertype != 'Company' or job.user_id != current_user.id:
+        abort(403)
+    applications = Application.query.filter_by(job_id=jobid).order_by(Application.date_posted.desc()).all()
+    return render_template('show_applications.html', applications=applications, job=job, Random_Review=Random_Review)
 
 
 @app.route("/professional-development-survey")
@@ -308,6 +326,9 @@ def show_jobs():
                            filters=filters, companies=companies, locations=locations, experiences=experiences)
 
 @app.route("/resume/<id>", methods=['GET'])
+@login_required
 def resume(id):
-    cv = Application.query.get(int(id)).cv
-    return render_template('resume.html', cv=cv, Random_Review=Random_Review, id=id)
+    application = Application.query.get_or_404(int(id))
+    if current_user.id not in (application.user_id, application.application_jober.user_id):
+        abort(403)
+    return render_template('resume.html', cv=application.cv, Random_Review=Random_Review, id=id)

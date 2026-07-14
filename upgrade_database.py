@@ -18,6 +18,9 @@ JOB_COLUMNS = {
     'company': 'VARCHAR(100)', 'company_logo': 'VARCHAR(20)', 'required_skills': 'TEXT',
     'experience_required': 'VARCHAR(50)', 'location': 'VARCHAR(100)', 'salary': 'VARCHAR(100)',
 }
+APPLICATION_COLUMNS = {
+    'full_name': 'VARCHAR(100)', 'email': 'VARCHAR(120)', 'phone_number': 'VARCHAR(25)',
+}
 
 
 def add_missing_columns(table, columns):
@@ -31,5 +34,7 @@ with app.app_context():
     db.create_all()
     add_missing_columns('user', USER_COLUMNS)
     add_missing_columns('jobs', JOB_COLUMNS)
+    add_missing_columns('application', APPLICATION_COLUMNS)
+    db.session.execute(text('CREATE UNIQUE INDEX IF NOT EXISTS uq_application_user_job ON application (user_id, job_id)'))
     db.session.commit()
     print('Database schema is ready for Career Mapping System.')
