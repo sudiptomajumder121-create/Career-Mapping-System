@@ -1,24 +1,68 @@
 {% extends "layout.html" %}
 {% block content %}
 <main class="container py-5"><div class="row justify-content-center"><div class="col-xl-9">
-  <form method="POST" enctype="multipart/form-data" class="profile-card shadow-sm">
-    {{ form.hidden_tag() }}
+  <form method="POST" enctype="multipart/form-data" class="profile-card shadow-sm" id="registration-form">
+    {{ form.hidden_tag() }}{{ form.usertype(id="profile-type") }}
     <h1 class="h3">Create your career profile</h1><p class="text-muted">Add your skills and interests to receive tailored IT job recommendations.</p>
-    <div class="row g-3">
-      <div class="col-md-4">{{ form.usertype.label(class="form-label") }}{{ form.usertype(class="form-select") }}</div>
-      <div class="col-md-8">{{ form.full_name.label(class="form-label") }}{{ form.full_name(class="form-control", placeholder="Your full name") }}{% for e in form.full_name.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}</div>
-      <div class="col-md-6">{{ form.email.label(class="form-label") }}{{ form.email(class="form-control") }}{% for e in form.email.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}</div>
-      <div class="col-md-3">{{ form.password.label(class="form-label") }}{{ form.password(class="form-control") }}</div><div class="col-md-3">{{ form.confirm_password.label(class="form-label") }}{{ form.confirm_password(class="form-control") }}</div>
-      <div class="col-md-6">{{ form.phone_number.label(class="form-label") }}{{ form.phone_number(class="form-control") }}</div><div class="col-md-6">{{ form.roll_number.label(class="form-label") }}{{ form.roll_number(class="form-control") }}</div>
-      <div class="col-md-6">{{ form.college.label(class="form-label") }}{{ form.college(class="form-control") }}</div><div class="col-md-6">{{ form.degree_course.label(class="form-label") }}{{ form.degree_course(class="form-control") }}</div>
-      <div class="col-md-6"><label class="form-label d-block">{{ form.skills.label.text }}</label><div class="choice-grid">{% for choice in form.skills %}<label>{{ choice(class="form-check-input") }} {{ choice.label.text }}</label>{% endfor %}</div></div>
-      <div class="col-md-6"><label class="form-label d-block">{{ form.programming_languages.label.text }}</label><div class="choice-grid">{% for choice in form.programming_languages %}<label>{{ choice(class="form-check-input") }} {{ choice.label.text }}</label>{% endfor %}</div></div>
-      <div class="col-md-6">{{ form.skills_custom.label(class="form-label") }}{{ form.skills_custom(class="form-control", placeholder="e.g. Flask, Power BI") }}</div>
-      <div class="col-md-6"><label class="form-label d-block">{{ form.areas_of_interest.label.text }}</label><div class="choice-grid">{% for choice in form.areas_of_interest %}<label>{{ choice(class="form-check-input") }} {{ choice.label.text }}</label>{% endfor %}</div></div>
-      <div class="col-md-4">{{ form.preferred_career_field.label(class="form-label") }}{{ form.preferred_career_field(class="form-select") }}</div><div class="col-md-4">{{ form.preferred_job_location.label(class="form-label") }}{{ form.preferred_job_location(class="form-select") }}</div><div class="col-md-4">{{ form.experience_level.label(class="form-label") }}{{ form.experience_level(class="form-select") }}</div>
-      <div class="col-12">{{ form.resume.label(class="form-label") }}{{ form.resume(class="form-control") }}</div>
+    <div class="profile-type-switch mb-4" role="group" aria-label="Profile type">
+      <button class="profile-type-option active" type="button" data-profile-type="Job Seeker" aria-pressed="true">Job Seeker</button>
+      <button class="profile-type-option" type="button" data-profile-type="Company" aria-pressed="false">Company</button>
+    </div>
+
+    <div class="job-seeker-only">
+      <div class="row g-3">
+        <div class="col-md-8">{{ form.full_name.label(class="form-label") }}{{ form.full_name(class="form-control", placeholder="Your full name") }}{% for e in form.full_name.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}</div>
+        <div class="col-md-6">{{ form.email.label(class="form-label") }}{{ form.email(class="form-control") }}{% for e in form.email.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}</div>
+        <div class="col-md-3">{{ form.password.label(class="form-label") }}{{ form.password(class="form-control") }}</div><div class="col-md-3">{{ form.confirm_password.label(class="form-label") }}{{ form.confirm_password(class="form-control") }}</div>
+        <div class="col-md-6">{{ form.phone_number.label(class="form-label") }}{{ form.phone_number(class="form-control") }}</div><div class="col-md-6">{{ form.roll_number.label(class="form-label") }}{{ form.roll_number(class="form-control") }}</div>
+        <div class="col-md-6">{{ form.college.label(class="form-label") }}{{ form.college(class="form-control") }}</div><div class="col-md-6">{{ form.degree_course.label(class="form-label") }}{{ form.degree_course(class="form-control") }}</div>
+        <div class="col-md-6"><label class="form-label d-block">{{ form.skills.label.text }}</label><div class="choice-grid">{% for choice in form.skills %}<label>{{ choice(class="form-check-input") }} {{ choice.label.text }}</label>{% endfor %}</div></div>
+        <div class="col-md-6"><label class="form-label d-block">{{ form.programming_languages.label.text }}</label><div class="choice-grid">{% for choice in form.programming_languages %}<label>{{ choice(class="form-check-input") }} {{ choice.label.text }}</label>{% endfor %}</div></div>
+        <div class="col-md-6">{{ form.skills_custom.label(class="form-label") }}{{ form.skills_custom(class="form-control", placeholder="e.g. Flask, Power BI") }}</div>
+        <div class="col-md-6"><label class="form-label d-block">{{ form.areas_of_interest.label.text }}</label><div class="choice-grid">{% for choice in form.areas_of_interest %}<label>{{ choice(class="form-check-input") }} {{ choice.label.text }}</label>{% endfor %}</div></div>
+        <div class="col-md-4">{{ form.preferred_career_field.label(class="form-label") }}{{ form.preferred_career_field(class="form-select") }}</div><div class="col-md-4">{{ form.preferred_job_location.label(class="form-label") }}{{ form.preferred_job_location(class="form-select") }}</div><div class="col-md-4">{{ form.experience_level.label(class="form-label") }}{{ form.experience_level(class="form-select") }}</div>
+        <div class="col-12">{{ form.resume.label(class="form-label") }}{{ form.resume(class="form-control") }}</div>
+      </div>
+    </div>
+
+    <div class="company-only d-none" aria-hidden="true">
+      <div class="row g-3">
+        <div class="col-md-6">{{ form.company_name.label(class="form-label") }}{{ form.company_name(class="form-control", placeholder="Your company name", disabled=true) }}{% for e in form.company_name.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}</div>
+        <div class="col-md-6">{{ form.company_role.label(class="form-label") }}{{ form.company_role(class="form-control", placeholder="e.g. Talent Acquisition Manager", disabled=true) }}{% for e in form.company_role.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}</div>
+        <div class="col-md-6"><label class="form-label" for="company-email">Email</label><input class="form-control" disabled type="email" id="company-email" name="email" value="{{ form.email.data or '' }}" required></div>
+        <div class="col-md-3"><label class="form-label" for="company-password">Password</label><input class="form-control" disabled type="password" id="company-password" name="password" required></div><div class="col-md-3"><label class="form-label" for="company-confirm-password">Confirm Password</label><input class="form-control" disabled type="password" id="company-confirm-password" name="confirm_password" required></div>
+        <div class="col-12">{{ form.job_title.label(class="form-label") }}{{ form.job_title(class="form-control", placeholder="e.g. Frontend Developer", disabled=true) }}{% for e in form.job_title.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}</div>
+        <div class="col-12">{{ form.job_description.label(class="form-label") }}{{ form.job_description(class="form-control", rows="5", placeholder="Describe the role and responsibilities", disabled=true) }}{% for e in form.job_description.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}</div>
+        <div class="col-md-6">{{ form.skills_looking_for.label(class="form-label") }}{{ form.skills_looking_for(class="form-control", placeholder="e.g. Python, SQL, React", disabled=true) }}<div class="form-text">{{ form.skills_looking_for.description }}</div>{% for e in form.skills_looking_for.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}</div>
+        <div class="col-md-6">{{ form.interests_looking_for.label(class="form-label") }}{{ form.interests_looking_for(class="form-control", placeholder="e.g. Web Development, AI/ML", disabled=true) }}<div class="form-text">{{ form.interests_looking_for.description }}</div>{% for e in form.interests_looking_for.errors %}<div class="text-danger small">{{ e }}</div>{% endfor %}</div>
+      </div>
     </div>
     <div class="mt-4">{{ form.submit(class="btn btn-primary px-4") }} <a href="{{ url_for('login') }}" class="ms-3">Already have an account? Log in</a></div>
   </form>
 </div></div></main>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const typeField = document.getElementById('profile-type');
+    const seekerSection = document.querySelector('.job-seeker-only');
+    const companySection = document.querySelector('.company-only');
+    const options = document.querySelectorAll('[data-profile-type]');
+    function setProfileType(type) {
+      const isCompany = type === 'Company';
+      typeField.value = type;
+      seekerSection.classList.toggle('d-none', isCompany);
+      companySection.classList.toggle('d-none', !isCompany);
+      seekerSection.setAttribute('aria-hidden', String(isCompany));
+      companySection.setAttribute('aria-hidden', String(!isCompany));
+      seekerSection.querySelectorAll('input, select, textarea').forEach(field => field.disabled = isCompany);
+      companySection.querySelectorAll('input, select, textarea').forEach(field => field.disabled = !isCompany);
+      options.forEach(option => {
+        const active = option.dataset.profileType === type;
+        option.classList.toggle('active', active);
+        option.setAttribute('aria-pressed', String(active));
+      });
+    }
+    options.forEach(option => option.addEventListener('click', () => setProfileType(option.dataset.profileType)));
+    setProfileType(typeField.value === 'Company' ? 'Company' : 'Job Seeker');
+  });
+</script>
 {% endblock %}

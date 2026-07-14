@@ -40,11 +40,22 @@ def register():
         elif current_user.usertype == 'Company':
             return redirect(url_for('posted_jobs'))
     form = RegistrationForm()
+    # Company accounts use the company name as their existing required username/full-name value.
+    if request.method == 'POST' and form.usertype.data == 'Company':
+        form.full_name.data = (form.company_name.data or '').strip()
+        # Job-seeker-only selects are disabled in the browser for company registration.
+        # Set their existing valid defaults before WTForms validates the submission.
+        form.preferred_career_field.data = ''
+        form.preferred_job_location.data = ''
+        form.experience_level.data = 'Fresher'
     if form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
         user = User(username=form.full_name.data.strip(), full_name=form.full_name.data.strip(),
                     usertype=form.usertype.data, email=form.email.data, password=hashed_password)
-        update_candidate_profile(user, form)
+        if user.usertype == 'Job Seeker':
+            update_candidate_profile(user, form)
+        else:
+            update_company_profile(user, form)
         db.session.add(user)
         db.session.commit()
         flash('You account has been created! You are now able to log in', 'success')
@@ -124,6 +135,16 @@ def update_candidate_profile(user, form):
     user.experience_level = form.experience_level.data or None
     if form.resume.data:
         user.resume_filename = save_resume(form.resume.data)
+
+
+def update_company_profile(user, form):
+    """Store company registration details without changing the job-seeker profile flow."""
+    user.company_name = form.company_name.data.strip()
+    user.company_role = form.company_role.data.strip()
+    user.company_job_title = form.job_title.data.strip()
+    user.company_job_description = form.job_description.data.strip()
+    user.company_skills = form.skills_looking_for.data.strip()
+    user.company_interests = form.interests_looking_for.data.strip()
 
 
 @app.route('/profile', methods=['GET', 'POST'])

@@ -10,6 +10,9 @@ USER_COLUMNS = {
     'programming_languages': 'TEXT', 'areas_of_interest': 'TEXT',
     'preferred_career_field': 'VARCHAR(100)', 'preferred_job_location': 'VARCHAR(100)',
     'experience_level': 'VARCHAR(30)', 'resume_filename': 'VARCHAR(255)',
+    'company_name': 'VARCHAR(150)', 'company_role': 'VARCHAR(100)',
+    'company_job_title': 'VARCHAR(100)', 'company_job_description': 'TEXT',
+    'company_skills': 'TEXT', 'company_interests': 'TEXT',
 }
 JOB_COLUMNS = {
     'company': 'VARCHAR(100)', 'company_logo': 'VARCHAR(20)', 'required_skills': 'TEXT',

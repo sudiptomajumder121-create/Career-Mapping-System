@@ -1,16 +1,13 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, SelectField, SelectMultipleField, IntegerField, TextAreaField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, HiddenField, SelectField, SelectMultipleField, IntegerField, TextAreaField
 from wtforms.widgets import CheckboxInput, ListWidget
-from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
+from wtforms.validators import DataRequired, Length, Email, EqualTo, Optional, ValidationError
 from app.models import User
 
 
 class RegistrationForm(FlaskForm):
-    usertype = SelectField('Select Usertype',
-                           choices=[('Job Seeker', 'Job Seeker'),
-                                    ('Company', 'Company')],
-                           validators=[DataRequired()])
+    usertype = HiddenField(default='Job Seeker', validators=[DataRequired()])
     full_name = StringField('Full Name', validators=[DataRequired(), Length(min=2, max=100)])
     email = StringField('Email',
                         validators=[DataRequired(), Email()])
@@ -29,12 +26,33 @@ class RegistrationForm(FlaskForm):
     preferred_job_location = SelectField('Preferred Job Location', choices=[('', 'Any location'), ('Bengaluru', 'Bengaluru'), ('Hyderabad', 'Hyderabad'), ('Pune', 'Pune'), ('Mumbai', 'Mumbai'), ('Chennai', 'Chennai'), ('Gurugram', 'Gurugram'), ('Remote', 'Remote')])
     experience_level = SelectField('Experience Level', choices=[('Fresher', 'Fresher'), ('1-2 Years', '1-2 Years'), ('3+ Years', '3+ Years')])
     resume = FileField('Resume Upload (optional)', validators=[FileAllowed(['pdf', 'doc', 'docx'], 'Please upload a PDF, DOC, or DOCX file.')])
+    company_name = StringField('Company Name', validators=[Optional(), Length(min=2, max=150)])
+    company_role = StringField('Company Role', validators=[Optional(), Length(min=2, max=100)])
+    job_title = StringField('Job Title', validators=[Optional(), Length(min=2, max=100)])
+    job_description = TextAreaField('Job Description')
+    skills_looking_for = StringField('Skills Looking For', description='Separate skills with commas')
+    interests_looking_for = StringField('Interests Looking For', description='Separate interests with commas')
     submit = SubmitField('Sign Up')
 
     def validate_full_name(self, full_name):
         user = User.query.filter_by(username=full_name.data.strip()).first()
         if user:
             raise ValidationError('An account with that full name already exists. Please use your name as registered.')
+
+    def validate_company_name(self, company_name):
+        if self.usertype.data == 'Company' and company_name.data and User.query.filter_by(username=company_name.data.strip()).first():
+            raise ValidationError('An account with that company name already exists.')
+
+    def validate(self, extra_validators=None):
+        valid = super().validate(extra_validators)
+        if self.usertype.data != 'Company':
+            return valid
+        for field in (self.company_name, self.company_role, self.job_title,
+                      self.job_description, self.skills_looking_for, self.interests_looking_for):
+            if not (field.data or '').strip():
+                field.errors.append('This field is required for company registration.')
+                valid = False
+        return valid
 
     def validate_email(self, email):
         user = User.query.filter_by(email=email.data).first()

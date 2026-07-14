@@ -25,6 +25,12 @@ class User(db.Model, UserMixin):
     preferred_job_location = db.Column(db.String(100))
     experience_level = db.Column(db.String(30))
     resume_filename = db.Column(db.String(255))
+    company_name = db.Column(db.String(150))
+    company_role = db.Column(db.String(100))
+    company_job_title = db.Column(db.String(100))
+    company_job_description = db.Column(db.Text)
+    company_skills = db.Column(db.Text)
+    company_interests = db.Column(db.Text)
     jobs = db.relationship('Jobs', backref='job_applier', lazy=True)
     applications = db.relationship('Application', backref='application_submiter', lazy=True)
 
